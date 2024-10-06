@@ -10,6 +10,7 @@ const app = express();
 
 
 // Set view engine to EJS
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Middleware to parse JSON request bodies
@@ -133,7 +134,7 @@ function loadExtensions() {
 
 // Root route to serve the management page
 app.get('/', (req, res) => {
-    res.render('./manage-extensions'); // Use EJS template for rendering
+    res.render('manage-extensions'); // Use EJS template for rendering
 });
 
 // Start the Express server
