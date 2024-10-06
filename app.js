@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+
 
 // Cloud URL where all available extensions are listed
 const extensionsUrl = 'https://raw.githubusercontent.com/try-econome/Cloud/refs/heads/main/extensions.json'; // Replace with your actual cloud URL
@@ -23,7 +23,7 @@ const extensionsUrl = 'https://raw.githubusercontent.com/try-econome/Cloud/refs/
 // Function to detect and load installed @econome extensions
 function loadExtensions() {
     const nodeModulesDir = path.join(__dirname, 'node_modules');
-    const packageJson = require('../package.json');
+    const packageJson = require('./package.json');
 
     // Get list of installed dependencies starting with @econome/
     const installedExtensions = Object.keys(packageJson.dependencies || {}).filter(dep => dep.startsWith('@econome/'));
@@ -42,7 +42,7 @@ function loadExtensions() {
 }
 
 // Serve static files for the management page (CSS, images, etc.)
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Fetch available extensions from the cloud URL, excluding installed ones
 app.get('/extensions/available', async (req, res) => {
@@ -51,7 +51,7 @@ app.get('/extensions/available', async (req, res) => {
         const availableExtensions = response.data;
 
         // Get installed extensions from package.json
-        const packageJson = require('../package.json');
+        const packageJson = require('./package.json');
         const installedExtensions = Object.keys(packageJson.dependencies || {}).filter(dep => dep.startsWith('@econome/'));
 
         // Filter out already installed extensions
@@ -66,7 +66,7 @@ app.get('/extensions/available', async (req, res) => {
 
 // Fetch installed extensions and render them with details
 app.get('/extensions/installed', (req, res) => {
-    const packageJson = require('../package.json');
+    const packageJson = require('./package.json');
     const installedExtensions = Object.keys(packageJson.dependencies || {}).filter(dep => dep.startsWith('@econome/'));
 
     const extensionDetails = installedExtensions.map((ext) => {
@@ -113,7 +113,7 @@ app.post('/extensions/uninstall', (req, res) => {
 // Function to detect and load installed @econome extensions
 function loadExtensions() {
     const nodeModulesDir = path.join(__dirname, 'node_modules');
-    const packageJson = require('../package.json');
+    const packageJson = require('./package.json');
 
     // Get list of installed dependencies starting with @econome/
     const installedExtensions = Object.keys(packageJson.dependencies || {}).filter(dep => dep.startsWith('@econome/'));
@@ -134,7 +134,7 @@ function loadExtensions() {
 
 // Root route to serve the management page
 app.get('/', (req, res) => {
-    res.render('manage-extensions'); // Use EJS template for rendering
+    res.render('manage-extensions'); // Render the view
 });
 
 // Start the Express server
