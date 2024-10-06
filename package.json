@@ -1,5 +1,5 @@
 {
-  "name": "economemanager",
+  "name": "@econome/economemanager",
   "version": "1.0.0",
   "description": "",
   "main": "src/app.js",
