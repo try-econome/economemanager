@@ -133,7 +133,7 @@ app.get('/', (req, res) => {
 });
 
 // Start the Express server
-const PORT = 3000;
+const PORT = 3500;
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
