@@ -26,7 +26,7 @@ function findUserPackageJson() {
 function loadExtensions() {
     const nodeModulesDir = path.join(__dirname, 'node_modules');
     const userPackageJsonPath = findUserPackageJson();
-    
+
     // Load the user's package.json
     const packageJson = require(userPackageJsonPath);
 
@@ -71,19 +71,37 @@ app.get('/extensions/available', async (req, res) => {
 });
 
 // Fetch installed extensions and render them with details
-app.get('/extensions/installed', (req, res) => {
+app.get('/extensions/installed', async (req, res) => {
     const userPackageJsonPath = findUserPackageJson();
     const packageJson = require(userPackageJsonPath);
     const installedExtensions = Object.keys(packageJson.dependencies || {}).filter(dep => dep.startsWith('@econome/'));
 
-    const extensionDetails = installedExtensions.map((ext) => {
+    const extensionDetails = await Promise.all(installedExtensions.map(async (ext) => {
         const extensionPath = path.join(__dirname, 'node_modules', ext, 'package.json');
-        const extensionPackage = fs.existsSync(extensionPath) ? require(extensionPath) : { description: 'No description available' };
+        let extensionPackage = {};
+
+        // Check if the package.json exists and has a description
+        if (fs.existsSync(extensionPath)) {
+            extensionPackage = require(extensionPath);
+        } else {
+            // Fetch from the cloud if local package.json doesn't exist
+            try {
+                const availableExtensions = (await axios.get(extensionsUrl)).data;
+                const matchedExtension = availableExtensions.find(e => e.name === ext);
+                if (matchedExtension) {
+                    extensionPackage.description = matchedExtension.description || 'No description available';
+                }
+            } catch (error) {
+                console.error(`Error fetching extension details for ${ext}:`, error);
+            }
+        }
+
         return {
             name: ext,
-            description: extensionPackage.description || 'No description available',
+            description: extensionPackage.description || 'No description available', // Default if no description is found
+            url: `https://registry.npmjs.org/${encodeURIComponent(ext)}` // Construct URL for the npm registry
         };
-    });
+    }));
 
     res.json(extensionDetails);
 });
