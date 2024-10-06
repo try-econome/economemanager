@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Extensions</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Extension Manager</h2>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/manage-extensions.html">Manage Extensions</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h1>Manage Extensions</h1>
+
+        <h2>Installed Extensions</h2>
+        <div id="installed-extensions" class="card-container"></div>
+
+
+        <h2>Available Extensions</h2>
+        <div id="available-extensions" class="card-container"></div>
+    </div>
+
+    <script>
+        // Fetch and display installed extensions
+fetch('/extensions/installed')
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('installed-extensions');
+        data.forEach(ext => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const title = document.createElement('h3');
+            title.textContent = ext.name;
+            const description = document.createElement('p');
+            description.textContent = ext.description;
+            const uninstallButton = document.createElement('button');
+            uninstallButton.textContent = 'Uninstall';
+            uninstallButton.className = 'button uninstall';
+            uninstallButton.onclick = () => uninstallExtension(ext.name);
+            card.appendChild(title);
+            card.appendChild(description);
+            card.appendChild(uninstallButton);
+            container.appendChild(card);
+        });
+    });
+
+
+        // Fetch and display available extensions
+        fetch('/extensions/available')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('available-extensions');
+                data.forEach(ext => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const title = document.createElement('h3');
+                    title.textContent = ext.name;
+                    const description = document.createElement('p');
+                    description.textContent = ext.description;
+                    const installButton = document.createElement('button');
+                    installButton.textContent = 'Install';
+                    installButton.className = 'button install';
+                    installButton.onclick = () => installExtension(ext.name);
+                    card.appendChild(title);
+                    card.appendChild(description);
+                    card.appendChild(installButton);
+                    container.appendChild(card);
+                });
+            });
+
+        // Install an extension
+        function installExtension(extensionName) {
+            fetch('/extensions/install', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ extension: extensionName })
+            })
+            .then(res => res.text())
+            .then(message => {
+                alert(message);
+                location.reload(); // Reload to update the installed extensions list
+            })
+            .catch(err => alert('Error: ' + err));
+        }
+
+        // Uninstall an extension
+        function uninstallExtension(extensionName) {
+            fetch('/extensions/uninstall', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ extension: extensionName })
+            })
+            .then(res => res.text())
+            .then(message => {
+                alert(message);
+                location.reload(); // Reload to update the installed extensions list
+            })
+            .catch(err => alert('Error: ' + err));
+        }
+    </script>
+</body>
+</html>
