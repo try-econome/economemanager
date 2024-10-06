@@ -6,11 +6,15 @@ const path = require('path');
 
 const app = express();
 
+
+
+
 // Set view engine to EJS
 app.set('view engine', 'ejs');
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Cloud URL where all available extensions are listed
 const extensionsUrl = 'https://raw.githubusercontent.com/try-econome/Cloud/refs/heads/main/extensions.json'; // Replace with your actual cloud URL
@@ -37,7 +41,7 @@ function loadExtensions() {
 }
 
 // Serve static files for the management page (CSS, images, etc.)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Fetch available extensions from the cloud URL, excluding installed ones
 app.get('/extensions/available', async (req, res) => {
@@ -129,7 +133,7 @@ function loadExtensions() {
 
 // Root route to serve the management page
 app.get('/', (req, res) => {
-    res.render('manage-extensions'); // Use EJS template for rendering
+    res.render('./manage-extensions'); // Use EJS template for rendering
 });
 
 // Start the Express server
